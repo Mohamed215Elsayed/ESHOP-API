@@ -168,16 +168,14 @@ app.use(globalErrorHandler);
 // ---------------------------------------------
 // 🖥️ Start Server
 // ---------------------------------------------
+// ✅ Export app for Vercel
+export default app;
 const PORT = process.env.PORT || 8000;
 if (process.env.NODE_ENV !== 'production') {
   const server = app.listen(PORT, () => {
     console.log(
       `\n🚀 ${'Server running on:'.green.bold} ${`http://localhost:${PORT}`.underline.cyan}`
     );
-  });
-} else {
-  const server = app.listen(PORT, () => {
-    console.log(`\n🚀 ${'Server running on port:'.green.bold} ${`${PORT}`.underline.cyan}`);
   });
 }
 // ---------------------------------------------
@@ -195,5 +193,3 @@ process.on('unhandledRejection', (err) => {
     process.exit(1);
   });
 });
-// ✅ Export app for Vercel
-export default app;
