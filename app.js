@@ -45,6 +45,8 @@ connectDB();
 // 🚀 Express App Setup
 // ---------------------------------------------
 const app = express();
+// Trust Vercel proxy
+app.set('trust proxy', 1);
 // Checkout webhook
 app.post('/webhook-checkout', express.raw({ type: 'application/json' }), webhookCheckout);
 // ---------------------------------------------
