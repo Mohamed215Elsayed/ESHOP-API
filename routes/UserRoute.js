@@ -39,7 +39,7 @@ router.post('/requestActivation', requestActivationCode);
 router.patch('/activateMe', activateLoggedUserData);
 
 /*********************/
-router.use(allowedTo('admin, manager'));
+router.use(allowedTo('admin', 'manager'));
 router.put('/changePassword/:id', changeUserPasswordValidator, changeUserPassword);
 /** -----------------------
  * 👤 User CRUD Routes

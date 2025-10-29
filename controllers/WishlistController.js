@@ -1,5 +1,5 @@
 import asyncHandler from 'express-async-handler';
-import User from '../models/UserModel.js';
+import UserModel from '../models/UserModel.js';
 import ApiError from '../utils/apiError.js';
 
 /**

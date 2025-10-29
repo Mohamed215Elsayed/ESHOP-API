@@ -27,7 +27,6 @@ export const getUsers = factory.getAll(UserModel, 'User');
 export const getUser = factory.getOne(UserModel);
 export const createUser = factory.createOne(UserModel);
 export const deleteUser = factory.deleteOne(UserModel);
-
 export const updateUser = asyncHandler(async (req, res, next) => {
   const updatedUser = await UserModel.findByIdAndUpdate(
     req.params.id,
