@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:dev": "nodemon --ignore node_modules --ignore Data --ignore .git app.js",
-    "start:prod": " NODE_ENV=production node app.js",
+    "start:prod": "set NODE_ENV=production&& node app.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
