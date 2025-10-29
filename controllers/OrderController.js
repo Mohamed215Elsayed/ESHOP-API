@@ -189,9 +189,10 @@ export const checkoutSession = asyncHandler(async (req, res, next) => {
 });
 
 /**
- * Helper: Create order after successful card payment
+ * Helper: Create order after successful (card payment)
  */
 const createCardOrder = async (session) => {
+  //object === session
   const cartId = session.client_reference_id;
   const shippingAddress = session.metadata;
   const orderPrice = session.amount_total / 100;
@@ -235,14 +236,12 @@ const createCardOrder = async (session) => {
  */
 export const webhookCheckout = asyncHandler(async (req, res, next) => {
   const sig = req.headers['stripe-signature'];
-
   let event;
   try {
     event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
-
   // Handle successful payment
   if (event.type === 'checkout.session.completed') {
     await createCardOrder(event.data.object);
