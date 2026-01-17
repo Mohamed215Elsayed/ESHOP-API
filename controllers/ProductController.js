@@ -6,22 +6,33 @@ import { createImageProcessor } from '../middlewares/imageHandler.js';
 const { upload, resize } = createImageProcessor({
   folder: 'products',
   prefix: 'product',
-  width: 2000,
-  height: 1333,
+  width: 1200,
+  height: 1200,
   fields: [
     { name: 'imageCover', maxCount: 1 },
-    { name: 'images', maxCount: 5 },
+    { name: 'images', maxCount: 4 },
   ],
 });
 
 export const uploadProductImage = upload;
 export const resizeProductImage = resize;
 /* -------------------------------------------------------------------------- */
-export const getProducts = factory.getAll(ProductModel, 'Product');
-export const getProduct = factory.getOne(ProductModel, 'reviews'); //virtual populate
-export const createProduct = factory.createOne(ProductModel);
+
+// ✅ هنا نضيف populate ديناميكي للـ getOne و getAll
+const populateOptions = [
+  { path: 'reviews' }, // virtual populate
+  { path: 'category', select: 'name' },
+  { path: 'brand', select: 'name' },
+  { path: 'subcategories', select: 'name' },
+];
+
+// 🟢 استخدام factory المحسّن
+export const getProducts = factory.getAll(ProductModel, 'Product', populateOptions);
+export const getProduct = factory.getOne(ProductModel, populateOptions);
+export const createProduct = factory.createOne(ProductModel, populateOptions);
 export const updateProduct = factory.updateOne(ProductModel);
 export const deleteProduct = factory.deleteOne(ProductModel);
+
 /* -------------------------------------------------------------------------- */
 // import asyncHandler from 'express-async-handler';
 // import slugify from 'slugify';

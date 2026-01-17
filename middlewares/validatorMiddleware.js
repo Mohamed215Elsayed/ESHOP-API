@@ -1,17 +1,15 @@
 import { validationResult } from 'express-validator';
 import ApiError from '../utils/apiError.js';
-// @desc  Finds the validation errors in this request and wraps them in an object with handy functions
+
 const validatorMiddleware = (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    // Create a readable message combining all validation errors
     const errorMessages = errors
       .array()
-      .map((err) => `${err.param}: ${err.msg}`)
+      .map((err) => (err.param && err.param !== 'undefined' ? `${err.param}: ${err.msg}` : err.msg))
       .join(', ');
 
-    // Pass the error to your global error handler
     return next(new ApiError(`Validation Error: ${errorMessages}`, 400));
   }
 
@@ -19,3 +17,20 @@ const validatorMiddleware = (req, res, next) => {
 };
 
 export default validatorMiddleware;
+
+/*
+const formattedErrors = errors.array().map(err => ({
+  field: err.param || null,
+  message: err.msg,
+}));
+
+return next(
+  new ApiError(
+    JSON.stringify({
+      type: 'validation',
+      errors: formattedErrors,
+    }),
+    400
+  )
+);
+*/

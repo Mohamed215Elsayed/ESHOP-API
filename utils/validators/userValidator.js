@@ -37,7 +37,8 @@ const emailValidator = (isOptional = false) => {
 const phoneValidator = check('phone')
   .optional()
   .isMobilePhone(['ar-EG', 'ar-SA'])
-  .withMessage('Invalid phone number — only Egyptian or Saudi numbers are accepted');
+  // .withMessage('Invalid phone number — only Egyptian or Saudi numbers are accepted');
+  .withMessage('رقم الهاتف غير صحيح — مسموح بأرقام مصرية وسعودية فقط');
 
 /** ---------- Create User Validator ---------- **/
 export const createUserValidator = [

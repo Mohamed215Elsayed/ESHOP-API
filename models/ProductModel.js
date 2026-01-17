@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
+import addImageUrlHook from '../middlewares/responseModelMiddleware.js';
 
 const { Schema, model } = mongoose;
-// import { addImagesUrlHook, addImageCoverUrlHook } from '../middlewares/responseModelMiddleware.js';
-import addImageUrlHook from '../middlewares/responseModelMiddleware.js';
+
 const productSchema = new Schema(
   {
     title: {
@@ -37,14 +37,14 @@ const productSchema = new Schema(
     price: {
       type: Number,
       required: [true, 'Product price is required'],
-      trim: true,
+      min: [0, 'Price cannot be negative'],
       max: [200000, 'Too long product price'],
     },
     priceAfterDiscount: {
       type: Number,
+      min: [0, 'Price cannot be negative'],
       validate: {
         validator: function (value) {
-          // Only validate if both prices exist
           if (this.price && value != null) {
             return value < this.price;
           }
@@ -53,14 +53,15 @@ const productSchema = new Schema(
         message: 'Discount price must be below original price',
       },
     },
-
     colors: {
       type: [String],
       default: [],
     },
     imageCover: {
       type: String,
-      required: [true, 'Product image cover is required'],
+      required: function () {
+        return this.isNew; // required عند الـ create فقط
+      },
     },
     images: {
       type: [String],
@@ -70,6 +71,7 @@ const productSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Category',
       required: [true, 'Product must belong to a category'],
+      index: true,
     },
     subcategories: [
       {
@@ -80,12 +82,14 @@ const productSchema = new Schema(
     brand: {
       type: Schema.Types.ObjectId,
       ref: 'Brand',
+      index: true,
     },
     ratingsAverage: {
       type: Number,
-      min: [1, 'Rating must be above or equal 1.0'],
+      default: 0,
+      min: [0, 'Rating must be above or equal 1.0'],
       max: [5, 'Rating must be below or equal 5.0'],
-      set: (val) => Math.round(val * 10) / 10, // round to 1 decimal place
+      set: (val) => Math.round(val * 10) / 10, // round to 1 decimal
     },
     ratingsQuantity: {
       type: Number,
@@ -94,42 +98,57 @@ const productSchema = new Schema(
   },
   {
     timestamps: true,
-    //to enable virtuals
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }
 );
 
-/* -------------------------------------------------------------
-   🔄 Pre Query Middleware
-   Auto-populate Category & Brand fields on any find query
-------------------------------------------------------------- */
-productSchema.pre(/^find/, function (next) {
-  this.populate({ path: 'category', select: 'name -_id' }).populate({
-    path: 'brand',
-    select: 'name -_id',
-  });
+/* ---------------- Pre Save Hook ---------------- */
+productSchema.pre('save', function (next) {
+  if (this.priceAfterDiscount != null && this.priceAfterDiscount >= this.price) {
+    return next(new Error('Discount price must be below original price'));
+  }
   next();
 });
 
-/* -------------------------------------------------------------
-   💡 Virtual Fields to link reviews to products
-------------------------------------------------------------- */
+/* ---------------- Pre FindOneAndUpdate Hook ---------------- */
+productSchema.pre('findOneAndUpdate', async function (next) {
+  const update = this.getUpdate();
+
+  if (update.priceAfterDiscount != null) {
+    const doc = await this.model.findOne(this.getQuery()).select('price');
+    if (doc && update.priceAfterDiscount >= doc.price) {
+      return next(new Error('Discount price must be below original price'));
+    }
+  }
+  next();
+});
+
+/* ---------------- Pre Query Hook ---------------- */
+productSchema.pre(/^find/, function (next) {
+  if (!this.getOptions().skipPopulate) {
+    this.populate({ path: 'category', select: 'name' }).populate({
+      path: 'brand',
+      select: 'name',
+    });
+  }
+  next();
+});
+
+/* ---------------- Virtuals ---------------- */
 productSchema.virtual('reviews', {
   ref: 'Review',
   foreignField: 'product',
   localField: '_id',
 });
 
-/* -------------------------------------------------------------
-   🧮 Indexes
-   Improves search & query performance
-------------------------------------------------------------- */
+/* ---------------- Indexes ---------------- */
 productSchema.index({ title: 'text', description: 'text' });
 productSchema.index({ price: 1, ratingsAverage: -1 });
-// addImageCoverUrlHook(productSchema, 'products');
-// addImagesUrlHook(productSchema, 'products');
-addImageUrlHook(productSchema, 'products', ['imageCover', 'images']);
-const ProductModel = model('Product', productSchema);
 
+/* ---------------- Image URL Middleware ---------------- */
+addImageUrlHook(productSchema, 'products', ['imageCover', 'images']);
+
+/* ---------------- Model ---------------- */
+const ProductModel = model('Product', productSchema);
 export default ProductModel;

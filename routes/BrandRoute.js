@@ -18,17 +18,14 @@ import { uploadBrandImage, resizeBrandImage } from '../controllers/BrandControll
 import { protect, allowedTo } from '../controllers/AuthController.js';
 const router = express.Router();
 
-router
-  .route('/')
-  .get(getBrands)
-  .post(
-    protect,
-    allowedTo('admin', 'manager'),
-    uploadBrandImage,
-    resizeBrandImage,
-    createBrandValidator,
-    createBrand
-  );
+router.route('/').get(getBrands).post(
+  protect,
+  allowedTo('admin', 'manager'),
+  uploadBrandImage,
+  resizeBrandImage,
+  createBrandValidator,
+  createBrand
+);
 
 router
   .route('/:id')
@@ -41,6 +38,10 @@ router
     updateBrandValidator,
     updateBrand
   )
-  .delete(protect, allowedTo('admin'), deleteBrandValidator, deleteBrand);
+  .delete(
+    protect, allowedTo('admin'),
+    deleteBrandValidator,
+    deleteBrand
+  );
 
 export default router;

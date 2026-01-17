@@ -20,7 +20,8 @@ import rateLimit from 'express-rate-limit';
 import hpp from 'hpp';
 import helmet from 'helmet';
 import { mongoSanitizeMiddleware, sanitizeInput } from './middlewares/xssMiddleware.js';
-
+// import passport from 'passport';
+// import { initPassport } from './config/passport.js';
 // ---------------------------------------------
 import connectDB from './config/database.js';
 import mountRoutes from './routes/index.js';
@@ -43,8 +44,13 @@ process.on('uncaughtException', (err) => {
 // 🚀 Express App Setup
 // ---------------------------------------------
 const app = express();
+// ---------------------------------------------
 //1. Trust Vercel proxy(important for rate limiting and logging)
 app.set('trust proxy', 1);
+// ---------------------------------------------
+// 🔐 Passport init (IMPORTANT)
+// app.use(passport.initialize());
+// initPassport();
 
 // Stripe Webhook
 app.post('/webhook-checkout', express.raw({ type: 'application/json' }), webhookCheckout);
@@ -111,13 +117,13 @@ if (process.env.NODE_ENV === 'development') {
 // 🛡️ Rate Limiting
 // ---------------------------------------------
 // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 min
-  max: 100,
-  message: 'Too many requests from this IP, please try again later.',
-});
-// Apply the rate limiting middleware to all requests
-app.use('/api', limiter);
+// const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000, // 15 min
+//   max: 100,
+//   message: 'Too many requests from this IP, please try again later.',
+// });
+// // Apply the rate limiting middleware to all requests
+// app.use('/api', limiter);
 
 // ---------------------------------------------
 // 📬 Test & Health Routes

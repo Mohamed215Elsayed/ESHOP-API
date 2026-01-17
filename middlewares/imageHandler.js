@@ -17,8 +17,8 @@ import { uploadMixOfImages, uploadSingleImage } from './uploadImageMiddleware-Me
 export const createImageProcessor = ({
   folder,
   prefix,
-  width = 600,
-  height = 600,
+  width, // = 1200,
+  height, // = 1200, // = 1200, //600
   fields,
   fieldName = 'image',
 }) => {
@@ -27,14 +27,20 @@ export const createImageProcessor = ({
 
   const resize = asyncHandler(async (req, res, next) => {
     if (!req.files && !req.file) return next();
-
+    const sharpOptions = {
+      width,
+      height,
+      fit: 'contain', // هذا هو السر: يمنع القص ويحتوي الصورة بالكامل
+      background: { r: 255, g: 255, b: 255, alpha: 1 }, // ملء الفراغات باللون الأبيض
+    };
     // 🖼 SINGLE IMAGE CASE
     if (req.file) {
       const filename = `${prefix}-${uuidv4()}-${Date.now()}.jpeg`;
       await sharp(req.file.buffer)
-        .resize(width, height)
+        .resize(sharpOptions) //width, height
         .toFormat('jpeg')
-        .jpeg({ quality: 90 })
+        .jpeg({ quality: 97 })
+        .flatten({ background: { r: 255, g: 255, b: 255 } })
         .toFile(`uploads/${folder}/${filename}`);
 
       req.body[fieldName] = filename;
@@ -46,9 +52,9 @@ export const createImageProcessor = ({
       if (req.files.imageCover?.[0]) {
         const filename = `${prefix}-cover-${uuidv4()}-${Date.now()}.jpeg`;
         await sharp(req.files.imageCover[0].buffer)
-          .resize(width, height)
+          .resize(sharpOptions) //.resize(width, height)
           .toFormat('jpeg')
-          .jpeg({ quality: 90 })
+          .jpeg({ quality: 97 })
           .toFile(`uploads/${folder}/${filename}`);
         req.body.imageCover = filename;
       }
@@ -60,14 +66,35 @@ export const createImageProcessor = ({
           req.files.images.map(async (file, i) => {
             const filename = `${prefix}-${uuidv4()}-${Date.now()}-${i + 1}.jpeg`;
             await sharp(file.buffer)
-              .resize(width, height)
+              .resize(sharpOptions) //.resize(width, height)
               .toFormat('jpeg')
-              .jpeg({ quality: 90 })
+              .jpeg({ quality: 97 })
               .toFile(`uploads/${folder}/${filename}`);
             req.body.images.push(filename);
           })
         );
       }
+    }
+    // 3. معالجة profileImg (للمستخدم)
+    if (req.files.profileImg?.[0]) {
+      const filename = `${prefix}-profile-${uuidv4()}-${Date.now()}.jpeg`;
+      await sharp(req.files.profileImg[0].buffer)
+        .resize(600, 600) // يمكنك تغيير المقاس أو استخدام المتغيرات
+        .toFormat('jpeg')
+        .jpeg({ quality: 97 })
+        .toFile(`uploads/${folder}/${filename}`);
+      req.body.profileImg = filename;
+    }
+
+    // 4. معالجة coverImg (للمستخدم)
+    if (req.files.coverImg?.[0]) {
+      const filename = `${prefix}-cover-${uuidv4()}-${Date.now()}.jpeg`;
+      await sharp(req.files.coverImg[0].buffer)
+        .resize(1200, 400) // مقاس عرضي مناسب للغلاف
+        .toFormat('jpeg')
+        .jpeg({ quality: 97 })
+        .toFile(`uploads/${folder}/${filename}`);
+      req.body.coverImg = filename;
     }
 
     next();

@@ -50,6 +50,11 @@ export const signupValidator = [
     }),
 
   check('passwordConfirm').notEmpty().withMessage('Please confirm your password'),
+  // ✅ Terms required
+  check('termsAccepted').equals('true').withMessage('يجب الموافقة على الشروط والأحكام'),
+  //  .withMessage('You must accept terms and privacy policy'),
+  //⚠️ ليه equals('true')؟
+  // لأن الداتا جاية من الـ frontend غالبًا string
 
   validatorMiddleware,
 ];

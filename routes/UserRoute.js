@@ -33,7 +33,9 @@ router.use(protect);
 //normal logged user
 router.get('/getMe', getLoggedUserData, getUser);
 router.put('/changeMyPassword', updateLoggedUserPassword);
-router.put('/updateMe', updateLoggedUserValidator, updateLoggedUserData);
+router.put('/updateMe', uploadUserImage,
+  resizeUserImage,
+  updateLoggedUserValidator, updateLoggedUserData);
 router.delete('/deleteMe', deleteLoggedUserData);
 router.post('/requestActivation', requestActivationCode);
 router.patch('/activateMe', activateLoggedUserData);

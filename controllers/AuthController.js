@@ -8,17 +8,80 @@ import createToken from '../utils/createToken.js';
 import getTokenFromHeaders from '../utils/getTokenFromHeaders.js';
 import UserModel from '../models/UserModel.js';
 import sanatizeUser from '../utils/sanatizeData.js';
+
+// export const googleAuthCallback = asyncHandler(async (req, res, next) => {
+//   try {
+//     const { email, googleId, name, avatar } = req.user;
+
+//     // 1️⃣ دور على المستخدم بالإيميل
+//     let user = await UserModel.findOne({ email });
+
+//     // 2️⃣ لو المستخدم موجود ومسجل بالطريقة العادية → ربط Google
+//     if (user && user.provider === 'local' && !user.googleId) {
+//       user.googleId = googleId; // ربط Google ID
+//       user.provider = 'google'; // تحديث المزود للحساب
+//       await user.save();
+//     }
+
+//     // 3️⃣ لو مستخدم جديد → إنشاء حساب جديد
+//     if (!user) {
+//       user = await UserModel.create({
+//         name,
+//         email,
+//         googleId,
+//         avatar,
+//         provider: 'google',
+//         active: true,
+//         termsAccepted: true,
+//         termsAcceptedAt: new Date(),
+//       });
+//     }
+
+//     // 4️⃣ إنشاء JWT
+//     const token = createToken(user._id);
+
+//     // 5️⃣ إعادة توجيه للفرونت مع التوكن
+//     res.redirect(`${process.env.CLIENT_URL}/login?token=${token}`);
+//   } catch (err) {
+//     console.error('Google Auth Callback Error:', err);
+//     res.redirect(`${process.env.CLIENT_URL}/login?error=oauth_failed`);
+//   }
+// });
+
 /** -----------------------------
  * 🧠 Signup
  * @route POST /api/v1/auth/signup
  * @access Public
  * ----------------------------- **/
 export const signup = asyncHandler(async (req, res, next) => {
-  const { name, email, password } = req.body;
-
-  const user = await UserModel.create({ name, email, password });
+  const { name, email, phone, password, termsAccepted } = req.body;
+  const isTermsAccepted = termsAccepted === true || termsAccepted === 'true';
+  if (!isTermsAccepted) {
+    return next(new ApiError('You must accept terms and privacy policy', 400));
+  }
+  // const existingUser = await UserModel.findOne({ email });
+  const existingUser = await UserModel.exists({ email }); //استخدم lean check للإيميل (أسرع)  \\⚡ أسرع وأخف من findOne
+  if (existingUser) {
+    return next(new ApiError('Email already exists', 400));
+  }
+  const user = await UserModel.create({
+    name,
+    email,
+    phone,
+    password,
+    // ✅ Terms
+    termsAccepted: isTermsAccepted,
+    termsAcceptedAt: new Date(),
+    termsVersion: '1.0',
+  });
   const token = createToken(user._id);
-  res.status(201).json({ data: sanatizeUser(user), token });
+  // res.status(201).json({ data: sanatizeUser(user), token });
+  res.status(201).json({
+    status: 'success',
+    message: 'Account created successfully',
+    data: sanatizeUser(user),
+    token,
+  });
 });
 
 /** -----------------------------
@@ -31,7 +94,9 @@ export const login = asyncHandler(async (req, res, next) => {
   if (!email || !password) {
     return next(new ApiError('Please provide email and password', 400));
   }
-  const user = await UserModel.findOne({ email }).select('+password'); // 👈 include password if it's excluded in schema;
+  // const user = await UserModel.findOne({ email }).select('+password'); // 👈 include password if it's excluded in schema;
+  const user = await UserModel.findOne({ email, active: true }).select('+password');
+
   if (!user) {
     return next(new ApiError('Incorrect email or password', 401));
   }
@@ -106,6 +171,12 @@ export const forgotPassword = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new ApiError(`No user found with email: ${email}`, 404));
   }
+  if (user.provider === 'google') {
+    return next(
+      new ApiError('This account uses Google login. Password reset is not available.', 400)
+    );
+  }
+
   // 2) If user exist, Generate hash reset random 6 digits and save it in db
   const resetCode = crypto.randomInt(100000, 1000000).toString();
   // const resetCode = Math.floor(100000 + Math.random() * 900000).toString();

@@ -22,6 +22,10 @@ const router = express.Router();
 // GET    /products/jkshjhsdjh2332n/reviews
 // GET    /products/jkshjhsdjh2332n/reviews/87487sfww3
 router.use('/:productId/reviews', ReviewRoute);
+// router.use('/:productId/reviews', (req, res, next) => {
+//   req.filterObj = { product: req.params.productId }; // auto filter by product
+//   next();
+// }, ReviewRoute);
 /* -------------------------------------------------------------------------- */
 /* 🧩 Products Routes
 /* -------------------------------------------------------------------------- */

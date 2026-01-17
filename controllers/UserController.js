@@ -11,15 +11,21 @@ import * as factory from '../services/handlersFactory.js';
    🖼️ Image Upload & Processing
 ---------------------------------------------------- */
 import { createImageProcessor } from '../middlewares/imageHandler.js';
+// import { createImageProcessor } from '../middlewares/imageHandler.js';
 const { upload, resize } = createImageProcessor({
   folder: 'users',
   prefix: 'user',
-  fieldName: 'profileImg',
+  width: 1200,
+  height: 1200,
+  // fieldName: 'profileImg',
+  fields: [
+    { name: 'profileImg', maxCount: 1 },
+    { name: 'coverImg', maxCount: 1 },
+  ],
 });
 
 export const uploadUserImage = upload;
 export const resizeUserImage = resize;
-
 /* ----------------------------------------------------
    👥 User CRUD Operations (Admin)
 ---------------------------------------------------- */
@@ -35,16 +41,15 @@ export const updateUser = asyncHandler(async (req, res, next) => {
       slug: req.body.slug,
       phone: req.body.phone,
       email: req.body.email,
-      profileImg: req.body.profileImg,
       role: req.body.role,
+      profileImg: req.body.profileImg,
+      coverImg: req.body.coverImg,
     },
     { new: true }
   );
-
   if (!updatedUser) {
     return next(new ApiError(`No user found with ID: ${req.params.id}`, 404));
   }
-
   res.status(200).json({ data: updatedUser });
 });
 
@@ -75,44 +80,36 @@ export const changeUserPassword = asyncHandler(async (req, res, next) => {
    @access  Private/Protect
 ---------------------------------------------------- */
 export const getLoggedUserData = asyncHandler((req, res, next) => {
-  req.params.id = req.user._id;
+  req.params.id = req.user._id;// Injecting the user's own ID into the params
   next();
 });
 
 // @desc    Update logged user password
 // @route   PUT /api/v1/users/changeMyPassword
 // @access  Private/Protect
+// export const updateLoggedUserPassword = asyncHandler(async (req, res) => {
+//   // 1) Update user password based user payload (req.user._id)
+//   const user = await UserModel.findByIdAndUpdate(
+//     req.user._id,
+//     {
+//       password: await bcrypt.hash(req.body.password, 12),
+//       passwordChangedAt: Date.now(),
+//     },
+//     { new: true }
+//   );
+//   // 2) Generate token
+//   const token = createToken(user._id);
+//   res.status(200).json({ data: user, token });
+// });
 export const updateLoggedUserPassword = asyncHandler(async (req, res) => {
-  // 1) Update user password based user payload (req.user._id)
-  const user = await UserModel.findByIdAndUpdate(
-    req.user._id,
-    {
-      password: await bcrypt.hash(req.body.password, 12),
-      passwordChangedAt: Date.now(),
-    },
-    { new: true }
-  );
-  // 2) Generate token
+  const user = await UserModel.findById(req.user._id);
+  user.password = req.body.password; // The pre('save') hook in your Model will hash this!
+  await user.save();
+
   const token = createToken(user._id);
   res.status(200).json({ data: user, token });
 });
 
-// @desc    Update logged user data (without password, role)
-// @route   PUT /api/v1/users/updateMe
-// @access  Private/Protect
-export const updateLoggedUserData = asyncHandler(async (req, res) => {
-  const updatedUser = await UserModel.findByIdAndUpdate(
-    req.user._id,
-    {
-      name: req.body.name,
-      email: req.body.email,
-      phone: req.body.phone,
-    },
-    { new: true }
-  );
-
-  res.status(200).json({ data: updatedUser });
-});
 
 // @desc    Deactivate logged user
 // @route   DELETE /api/v1/users/deleteMe
@@ -210,5 +207,28 @@ export const activateLoggedUserData = asyncHandler(async (req, res, next) => {
     status: 'success',
     message: 'Account reactivated successfully',
     data: user,
+  });
+});
+
+/* -------------------------------------------------------------------------- */
+// @desc    Update logged user data (without password, role)
+// @route   PUT /api/v1/users/updateMe
+// @access  Private/Protect
+
+export const updateLoggedUserData = asyncHandler(async (req, res) => {
+  const updatedUser = await UserModel.findByIdAndUpdate(
+    req.user._id,
+    {
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+      profileImg: req.body.profileImg,
+      coverImg: req.body.coverImg,
+    },
+    { new: true, runValidators: true }
+  );
+  res.status(200).json({
+    status: 'success',
+    data: updatedUser
   });
 });

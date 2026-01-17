@@ -1,7 +1,8 @@
 import asyncHandler from 'express-async-handler';
 import UserModel from '../models/UserModel.js';
 import ApiError from '../utils/apiError.js';
-
+import { getAll } from '../services/handlersFactory.js';
+import ProductModel from "../models/ProductModel.js"
 /**
  *@desc  🛍️ Add Product to Wishlist
  *@route   POST /api/v1/wishlist
@@ -57,14 +58,22 @@ export const removeProductFromWishlist = asyncHandler(async (req, res, next) => 
    @route   GET /api/v1/wishlist
    @access  Protected (User)
 ---------------------------------------------------- */
-export const getLoggedUserWishlist = asyncHandler(async (req, res, next) => {
-  const user = await UserModel.findById(req.user._id).populate('wishlist');
+// export const getLoggedUserWishlist = asyncHandler(async (req, res, next) => {
+//   const user = await UserModel.findById(req.user._id).populate('wishlist');
 
-  if (!user) return next(new ApiError('User not found', 404));
+//   if (!user) return next(new ApiError('User not found', 404));
 
-  res.status(200).json({
-    status: 'success',
-    results: user.wishlist.length,
-    data: user.wishlist,
-  });
+//   res.status(200).json({
+//     status: 'success',
+//     results: user.wishlist.length,
+//     data: user.wishlist,
+//   });
+// });
+// middleware لضبط الفلتر قبل استدعاء getAll
+export const createFilterForLoggedUserWishlist = asyncHandler(async (req, res, next) => {
+  // نضع شرط أن يكون المعرف الخاص بالمنتج موجوداً في مصفوفة مفضلة المستخدم الحالي
+  // نستخدم عامل $in الخاص بـ MongoDB
+  req.filterObj = { _id: { $in: req.user.wishlist } };
+  next();
 });
+export const getLoggedUserWishlist = getAll(ProductModel, 'Product');

@@ -52,6 +52,8 @@ router
     updateCategoryValidator,
     updateCategory
   )
-  .delete(protect, allowedTo('admin'), deleteCategoryValidator, deleteCategory);
+  .delete(
+    protect, allowedTo('admin'), 
+    deleteCategoryValidator, deleteCategory);
 
 export default router;

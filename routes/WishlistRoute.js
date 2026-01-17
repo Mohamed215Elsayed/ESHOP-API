@@ -4,6 +4,7 @@ import {
   addProductToWishlist,
   removeProductFromWishlist,
   getLoggedUserWishlist,
+  createFilterForLoggedUserWishlist,
 } from '../controllers/WishlistController.js';
 import {
   addProductToWishlistValidator,
@@ -18,8 +19,8 @@ router.use(protect, allowedTo('user'));
 router
   .route('/')
   .post(addProductToWishlistValidator, addProductToWishlist)
-  .get(getLoggedUserWishlist);
-
+  // .get(getLoggedUserWishlist);
+  .get(createFilterForLoggedUserWishlist, getLoggedUserWishlist);
 // ✅ /api/v1/wishlist/:productId
 router.delete('/:productId', removeProductFromWishlistValidator, removeProductFromWishlist);
 

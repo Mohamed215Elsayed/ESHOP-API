@@ -4,6 +4,7 @@ import slugify from 'slugify';
 import addImageUrlHook from '../middlewares/responseModelMiddleware.js';
 const { Schema } = mongoose;
 import { ROLES } from '../utils/user-roles.js';
+
 const userSchema = new Schema(
   {
     name: {
@@ -20,18 +21,26 @@ const userSchema = new Schema(
       required: [true, 'Email is required'],
       unique: true,
       lowercase: true,
+      match: [/^\S+@\S+\.\S+$/, 'Invalid email format'],
     },
     phone: {
       type: String,
+      match: [/^01[0-2,5]{1}[0-9]{8}$/, 'Invalid phone number'],
     },
     profileImg: {
       type: String,
     },
+    coverImg: { // إضافة حقل صورة الغلاف
+      type: String,
+    },
     password: {
       type: String,
-      required: [true, 'Password is required'],
+      // required: [true, 'Password is required'],
       minlength: [6, 'Password must be at least 6 characters long'],
       select: false, // hide by default
+      required: function () {
+        return this.provider === 'local';
+      },
     },
     passwordChangedAt: Date,
     passwordResetCode: String,
@@ -49,7 +58,6 @@ const userSchema = new Schema(
     activationCode: String,
     activationCodeExpires: Date,
     activationVerified: Boolean,
-
     // child reference (one to many)
     wishlist: [
       {
@@ -67,15 +75,42 @@ const userSchema = new Schema(
         postalCode: String,
       },
     ],
+    // ✅ Terms & Privacy
+    termsAccepted: {
+      type: Boolean,
+      required: [true, 'You must accept terms and privacy policy'],
+      default: false,
+    },
+
+    termsAcceptedAt: {
+      type: Date,
+    },
+
+    // termsVersion: {
+    //   type: String,
+    //   default: '1.0',
+    // },
+    // googleId: String,
+    // provider: {
+    //   type: String,
+    //   enum: ['local', 'google'],
+    //   default: 'local',
+    // },
   },
+
   { timestamps: true }
 );
 
 // 🔹 Middleware Hooks
 // Hash password before saving
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+  if (!this.isModified('password') || !this.password) return next();
+
   this.password = await bcrypt.hash(this.password, 12);
+
+  if (!this.isNew) {
+    this.passwordChangedAt = Date.now() - 1000;
+  }
   next();
 });
 
@@ -103,9 +138,6 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   return false;
 };
 
-// 🔹 Post-processing Add full image URL dynamically
-// addProfileImgUrlHookForUser(userSchema, 'users');
-addImageUrlHook(userSchema, 'users', 'profileImg');
 
 // Hide sensitive fields in JSON output
 userSchema.set('toJSON', {
@@ -115,7 +147,15 @@ userSchema.set('toJSON', {
     return ret;
   },
 });
-
+userSchema.pre('save', function (next) {
+  if (this.isModified('termsAccepted') && this.termsAccepted === true) {
+    this.termsAcceptedAt = new Date();
+  }
+  next();
+});
+// 🔹 Post-processing Add full image URL dynamically
+/* ---------------- Image URL Middleware ---------------- */
+addImageUrlHook(userSchema, 'users', ['profileImg', 'coverImg']);
 // 🔹 Model Export
-const UserModel = mongoose.model('User', userSchema);
+const UserModel = mongoose.models.User || mongoose.model('User', userSchema);
 export default UserModel;

@@ -12,19 +12,24 @@ export const createReviewValidator = [
   check('ratings')
     .notEmpty()
     .withMessage('Ratings value is required')
-    .isFloat({ min: 1, max: 5 })
-    .withMessage('Ratings value must be between 1 and 5'),
+    .isFloat({ min: 0, max: 5 })
+    .withMessage('Ratings value must be between 0 and 5'),
 
   check('user').optional().isMongoId().withMessage('Invalid user ID format'),
 
   check('product')
     .isMongoId()
     .withMessage('Invalid product ID format')
+    .custom((val, { req }) => {
+      if (req.user.role === 'admin') {
+        throw new Error('Admin is not allowed to add reviews.');
+      }
+      return true;
+    })
     .custom(async (val, { req }) => {
-      // ✅ Prevent duplicate review by the same user on the same product
       const existingReview = await Review.findOne({
         user: req.user._id,
-        product: req.body.product,
+        product: val,
       });
 
       if (existingReview) {
@@ -51,7 +56,8 @@ export const updateReviewValidator = [
     if (!review) throw new Error(`No review found with ID: ${val}`);
 
     // ✅ Only the review owner can update their review
-    if (review.user._id.toString() !== req.user._id.toString()) {
+    // if (review.user._id.toString() !== req.user._id.toString()) {
+    if (!review.user.equals(req.user._id)) {
       throw new Error('You are not authorized to update this review.');
     }
   }),
