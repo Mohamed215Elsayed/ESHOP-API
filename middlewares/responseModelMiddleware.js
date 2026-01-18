@@ -1,29 +1,29 @@
-/**
- * ✅ Generic helper to safely add a BASE_URL prefix to image fields after init/save
- * @param {mongoose.Schema} schema - The Mongoose schema
- * @param {string} folder - Folder name under /uploads (e.g. 'brands', 'users')
- * @param {string|string[]} fields - Field(s) containing image filenames
- */
-const addImageUrlHook = (schema, folder, fields) => {
-  schema.post(['init', 'save'], function (doc) {
-    if (!process.env.BASE_URL) return; // Avoid crash if not set
+// /**
+//  * ✅ Generic helper to safely add a BASE_URL prefix to image fields after init/save
+//  * @param {mongoose.Schema} schema - The Mongoose schema
+//  * @param {string} folder - Folder name under /uploads (e.g. 'brands', 'users')
+//  * @param {string|string[]} fields - Field(s) containing image filenames
+//  */
+// const addImageUrlHook = (schema, folder, fields) => {
+//   schema.post(['init', 'save'], function (doc) {
+//     if (!process.env.BASE_URL) return; // Avoid crash if not set
 
-    const addPrefix = (filename) => `${process.env.BASE_URL}/uploads/${folder}/${filename}`;
+//     const addPrefix = (filename) => `${process.env.BASE_URL}/uploads/${folder}/${filename}`;
 
-    (Array.isArray(fields) ? fields : [fields]).forEach((field) => {
-      const value = doc[field];
-      if (!value) return;
+//     (Array.isArray(fields) ? fields : [fields]).forEach((field) => {
+//       const value = doc[field];
+//       if (!value) return;
 
-      if (Array.isArray(value)) {
-        doc[field] = value.map(addPrefix);
-      } else {
-        doc[field] = addPrefix(value);
-      }
-    });
-  });
-};
+//       if (Array.isArray(value)) {
+//         doc[field] = value.map(addPrefix);
+//       } else {
+//         doc[field] = addPrefix(value);
+//       }
+//     });
+//   });
+// };
 
-export default addImageUrlHook;
+// export default addImageUrlHook;
 
 // export const addImageUrlHook = (schema, folder) => {
 //   schema.post(['init', 'save'], function (doc) {
@@ -56,3 +56,37 @@ export default addImageUrlHook;
 //     }
 //   });
 // };
+
+/**
+ * ✅ Safe helper to add BASE_URL only when value is a filename
+ */
+const addImageUrlHook = (schema, folder, fields) => {
+  schema.post(['init', 'save'], function (doc) {
+    if (!process.env.BASE_URL) return;
+
+    const normalize = (value) => {
+      if (!value) return value;
+
+      // 🔥 لو URL كامل → سيبه زي ما هو
+      if (typeof value === 'string' && value.startsWith('http')) {
+        return value;
+      }
+
+      // filename فقط
+      return `${process.env.BASE_URL}/uploads/${folder}/${value}`;
+    };
+
+    (Array.isArray(fields) ? fields : [fields]).forEach((field) => {
+      const value = doc[field];
+      if (!value) return;
+
+      if (Array.isArray(value)) {
+        doc[field] = value.map(normalize);
+      } else {
+        doc[field] = normalize(value);
+      }
+    });
+  });
+};
+
+export default addImageUrlHook;

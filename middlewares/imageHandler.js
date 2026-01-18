@@ -79,9 +79,9 @@ export const createImageProcessor = ({
     if (req.files.profileImg?.[0]) {
       const filename = `${prefix}-profile-${uuidv4()}-${Date.now()}.jpeg`;
       await sharp(req.files.profileImg[0].buffer)
-        .resize(600, 600) // يمكنك تغيير المقاس أو استخدام المتغيرات
+        .resize(1000, 1000)
         .toFormat('jpeg')
-        .jpeg({ quality: 97 })
+        .jpeg({ quality: 100 })
         .toFile(`uploads/${folder}/${filename}`);
       req.body.profileImg = filename;
     }
@@ -90,9 +90,9 @@ export const createImageProcessor = ({
     if (req.files.coverImg?.[0]) {
       const filename = `${prefix}-cover-${uuidv4()}-${Date.now()}.jpeg`;
       await sharp(req.files.coverImg[0].buffer)
-        .resize(1200, 400) // مقاس عرضي مناسب للغلاف
+        .resize(1000, 1000)
         .toFormat('jpeg')
-        .jpeg({ quality: 97 })
+        .jpeg({ quality: 100 })
         .toFile(`uploads/${folder}/${filename}`);
       req.body.coverImg = filename;
     }
