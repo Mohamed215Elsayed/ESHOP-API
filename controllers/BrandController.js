@@ -2,15 +2,12 @@ import BrandModel from '../models/BrandModel.js';
 import * as factory from '../services/handlersFactory.js';
 /* -------------------------------------------------------------------------- */
 import { createImageProcessor } from '../middlewares/imageHandler.js';
-
-const { upload, resize } = createImageProcessor({
+export const { upload: uploadBrandImage, resize: resizeBrandImage } = createImageProcessor({
   folder: 'brands',
   prefix: 'brand',
-  fieldName: 'image',
+  fields: [{ name: 'image', type: 'single', width: 800, height: 800 }],
 });
 
-export const uploadBrandImage = upload;
-export const resizeBrandImage = resize;
 /* -------------------------------------------------------------------------- */
 export const getBrands = factory.getAll(BrandModel, 'Brand');
 export const getBrand = factory.getOne(BrandModel);

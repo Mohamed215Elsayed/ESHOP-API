@@ -3,19 +3,15 @@ import * as factory from '../services/handlersFactory.js';
 /* -------------------------------------------------------------------------- */
 import { createImageProcessor } from '../middlewares/imageHandler.js';
 
-const { upload, resize } = createImageProcessor({
+const { upload: uploadProductImage, resize: resizeProductImage } = createImageProcessor({
   folder: 'products',
-  prefix: 'product',
-  width: 1200,
-  height: 1200,
+  prefix: 'prod',
   fields: [
-    { name: 'imageCover', maxCount: 1 },
-    { name: 'images', maxCount: 4 },
+    { name: 'imageCover', type: 'single', width: 1200, height: 1200 },
+    { name: 'images', type: 'multiple', width: 1000, height: 1000, maxCount: 5 },
   ],
 });
-
-export const uploadProductImage = upload;
-export const resizeProductImage = resize;
+export { uploadProductImage, resizeProductImage };
 /* -------------------------------------------------------------------------- */
 
 // ✅ هنا نضيف populate ديناميكي للـ getOne و getAll

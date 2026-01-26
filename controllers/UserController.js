@@ -11,18 +11,15 @@ import * as factory from '../services/handlersFactory.js';
    🖼️ Image Upload & Processing
 ---------------------------------------------------- */
 import { createImageProcessor } from '../middlewares/imageHandler.js';
-// import { createImageProcessor } from '../middlewares/imageHandler.js';
 const { upload, resize } = createImageProcessor({
   folder: 'users',
   prefix: 'user',
-  width: 1200,
-  height: 1200,
-  // fieldName: 'profileImg',
   fields: [
-    { name: 'profileImg', maxCount: 1 },
-    { name: 'coverImg', maxCount: 1 },
+    { name: 'profileImg', type: 'single', width: 1200, height: 1200 },
+    { name: 'coverImg', type: 'single', width: 1600, height: 1600 }
   ],
 });
+
 
 export const uploadUserImage = upload;
 export const resizeUserImage = resize;

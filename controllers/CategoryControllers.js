@@ -6,8 +6,9 @@ import { createImageProcessor } from '../middlewares/imageHandler.js';
 const { upload, resize } = createImageProcessor({
   folder: 'categories',
   prefix: 'category',
-  fieldName: 'image',
+  fields: [{ name: 'image', type: 'single', width: 600, height: 600 }],
 });
+
 
 export const uploadCategoryImage = upload;
 export const resizeCategoryImage = resize;
