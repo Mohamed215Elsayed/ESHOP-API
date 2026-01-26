@@ -5,13 +5,13 @@ import slugify from 'slugify';
 import { v4 as uuidv4 } from 'uuid';
 import { uploadMixOfImages, uploadSingleImage } from './uploadImageMiddleware-MemoryStorage.js';
 
-export const createImageProcessor = ({ folder, prefix, fields, width = 600, height = 600 }) => {
-  const multerFields = fields.map(f => ({
+export const createImageProcessor = ({ folder, prefix, fields, width = 1200, height = 1200 }) => {
+  const multerFields = fields.map((f) => ({
     name: f.name,
-    maxCount: f.type === 'single' ? 1 : f.maxCount || 5
+    maxCount: f.type === 'single' ? 1 : f.maxCount || 5,
   }));
 
-  const upload = uploadMixOfImages(multerFields); 
+  const upload = uploadMixOfImages(multerFields);
 
   const resize = asyncHandler(async (req, res, next) => {
     if (!req.files) return next();
@@ -24,9 +24,18 @@ export const createImageProcessor = ({ folder, prefix, fields, width = 600, heig
         const filename = `${prefix}-${name}-${uuidv4()}-${Date.now()}.jpeg`;
 
         await sharp(fileBuffer)
-          .resize(w, h)
+          // .resize(w, h)
+          .resize(w, h, {
+            fit: 'inside',
+            withoutEnlargement: true,
+          })
+          // .toFormat('jpeg')
+          // .jpeg({ quality: 97 })
           .toFormat('jpeg')
-          .jpeg({ quality: 97 })
+          .jpeg({
+            quality: 90,
+            chromaSubsampling: '4:4:4',
+          })
           .toFile(`uploads/${folder}/${filename}`);
 
         req.body[name] = filename;
@@ -38,9 +47,18 @@ export const createImageProcessor = ({ folder, prefix, fields, width = 600, heig
           req.files[name].map(async (file, i) => {
             const filename = `${prefix}-${name}-${uuidv4()}-${Date.now()}-${i + 1}.jpeg`;
             await sharp(file.buffer)
-              .resize(w, h)
+              // .resize(w, h)
+              .resize(w, h, {
+                fit: 'inside',
+                withoutEnlargement: true,
+              })
+              // .toFormat('jpeg')
+              // .jpeg({ quality: 97 })
               .toFormat('jpeg')
-              .jpeg({ quality: 97 })
+              .jpeg({
+                quality: 90,
+                chromaSubsampling: '4:4:4',
+              })
               .toFile(`uploads/${folder}/${filename}`);
             req.body[name].push(filename);
           })
