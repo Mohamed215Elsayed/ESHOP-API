@@ -91,7 +91,15 @@ app.use(
 );
 
 // Parse JSON requests
-app.use(express.json({ limit: '20kb' }));
+// app.use(express.json({ limit: '20kb' }));
+app.use((req, res, next) => {
+  if (req.originalUrl === '/webhook-checkout') {
+    next();
+  } else {
+    express.json({ limit: '20kb' })(req, res, next);
+  }
+});
+
 
 // Response Compression
 app.use(compression());
