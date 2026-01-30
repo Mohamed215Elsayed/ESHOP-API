@@ -256,16 +256,35 @@ export const webhookCheckout = asyncHandler(async (req, res, next) => {
   let event;
   try {
     event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    console.log('✅ Webhook event received:', event.type);
   } catch (err) {
+    console.log('❌ Webhook signature verification failed:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
-  // Handle successful payment
+
   if (event.type === 'checkout.session.completed') {
+    console.log('💳 Payment successful, creating order...');
     await createCardOrder(event.data.object);
   }
 
   res.status(200).json({ received: true });
 });
+
+// export const webhookCheckout = asyncHandler(async (req, res, next) => {
+//   const sig = req.headers['stripe-signature'];
+//   let event;
+//   try {
+//     event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+//   } catch (err) {
+//     return res.status(400).send(`Webhook Error: ${err.message}`);
+//   }
+//   // Handle successful payment
+//   if (event.type === 'checkout.session.completed') {
+//     await createCardOrder(event.data.object);
+//   }
+
+//   res.status(200).json({ received: true });
+// });
 // @desc    Delete a specific order
 // @route   DELETE /api/v1/orders/:id
 // @access  Protected/Admin-Manager

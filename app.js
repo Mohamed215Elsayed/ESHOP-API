@@ -101,15 +101,24 @@ const allowedOrigins = [
   'http://localhost:3000',
   'https://eshop-api-project.vercel.app',
 ];
-
 app.use(cors({
   origin: function(origin, callback) {
     if(!origin) return callback(null, true); // Postman, curl
-    if(allowedOrigins.indexOf(origin) === -1) return callback(new Error('CORS Not Allowed'), false);
+    if(allowedOrigins.indexOf(origin) === -1 && !origin.includes('stripe.com')) 
+      return callback(new Error('CORS Not Allowed'), false);
     return callback(null, true);
   },
   credentials: true
 }));
+
+// app.use(cors({
+//   origin: function(origin, callback) {
+//     if(!origin) return callback(null, true); // Postman, curl
+//     if(allowedOrigins.indexOf(origin) === -1) return callback(new Error('CORS Not Allowed'), false);
+//     return callback(null, true);
+//   },
+//   credentials: true
+// }));
 
 // app.use(cors());
 // app.options(/.*/, cors());
