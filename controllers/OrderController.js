@@ -489,8 +489,14 @@ export const webhookCheckout = asyncHandler(async (req, res) => {
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
-    console.log('✅ Webhook received:', event.type);
+    // event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+     event = stripe.webhooks.constructEvent(
+      req.rawBody, // 👈 هنا
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+    console.log('✅ Webhook event received:', event.type);
+    // console.log('✅ Webhook received:', event.type);
   } catch (err) {
     console.error('❌ Webhook signature failed:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);

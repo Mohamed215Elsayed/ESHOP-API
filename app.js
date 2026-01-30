@@ -92,14 +92,24 @@ app.use(
 
 // Parse JSON requests
 // app.use(express.json({ limit: '20kb' }));
-app.use((req, res, next) => {
-  if (req.originalUrl === '/webhook-checkout') {
-    next();
-  } else {
-    express.json({ limit: '20kb' })(req, res, next);
-  }
-});
-
+// app.use((req, res, next) => {
+//   if (req.originalUrl === '/webhook-checkout') {
+//     next();
+//   } else {
+//     express.json({ limit: '20kb' })(req, res, next);
+//   }
+// });
+app.use(
+  express.json({
+    limit: '20kb',
+    verify: (req, res, buf) => {
+      if (req.originalUrl === '/webhook-checkout') {
+        req.rawBody = buf;
+      }
+    },
+  })
+);
+// ---------------------------------------------
 
 // Response Compression
 app.use(compression());
