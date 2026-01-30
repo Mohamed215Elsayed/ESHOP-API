@@ -54,7 +54,16 @@ app.set('trust proxy', 1);
 
 // Stripe Webhook
 app.post('/webhook-checkout', express.raw({ type: 'application/json' }), webhookCheckout);
-
+app.use(
+  express.json({
+    limit: '20kb',
+    verify: (req, res, buf) => {
+      if (req.originalUrl === '/webhook-checkout') {
+        req.rawBody = buf;
+      }
+    },
+  })
+);
 // ---------------------------------------------
 // 🛡️ Security Middlewares
 // ---------------------------------------------
@@ -99,16 +108,16 @@ app.use(
 //     express.json({ limit: '20kb' })(req, res, next);
 //   }
 // });
-app.use(
-  express.json({
-    limit: '20kb',
-    verify: (req, res, buf) => {
-      if (req.originalUrl === '/webhook-checkout') {
-        req.rawBody = buf;
-      }
-    },
-  })
-);
+// app.use(
+//   express.json({
+//     limit: '20kb',
+//     verify: (req, res, buf) => {
+//       if (req.originalUrl === '/webhook-checkout') {
+//         req.rawBody = buf;
+//       }
+//     },
+//   })
+// );
 // ---------------------------------------------
 
 // Response Compression
