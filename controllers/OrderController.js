@@ -421,6 +421,7 @@ export const checkoutSession = asyncHandler(async (req, res, next) => {
 ===================================================== */
 const createCardOrder = async (session) => {
   try {
+    const paymentIntentId = session.payment_intent;
     const cartId = session.client_reference_id;
     console.log('🔔 Webhook processing cart:', cartId);
 
@@ -436,9 +437,14 @@ const createCardOrder = async (session) => {
       return;
     }
 
-    const existingOrder = await OrderModel.findOne({ cartId });
+    // const existingOrder = await OrderModel.findOne({ cartId });
+    // if (existingOrder) {
+    //   console.log('⚠️ Order already created for this cart');
+    //   return;
+    // }
+    const existingOrder = await OrderModel.findOne({ paymentIntentId });
     if (existingOrder) {
-      console.log('⚠️ Order already created for this cart');
+      console.log('⚠️ Order already created for this payment');
       return;
     }
 
@@ -447,6 +453,8 @@ const createCardOrder = async (session) => {
 
     const order = await OrderModel.create({
       user: user._id,
+      cartId,
+      paymentIntentId,
       cartItems: cart.cartItems,
       shippingAddress: {
         details: shippingAddress.details,
