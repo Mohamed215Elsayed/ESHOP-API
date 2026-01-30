@@ -97,8 +97,22 @@ app.use(express.json({ limit: '20kb' }));
 app.use(compression());
 
 // CORS
-app.use(cors());
-app.options(/.*/, cors());
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://eshop-api-project.vercel.app',
+];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    if(!origin) return callback(null, true); // Postman, curl
+    if(allowedOrigins.indexOf(origin) === -1) return callback(new Error('CORS Not Allowed'), false);
+    return callback(null, true);
+  },
+  credentials: true
+}));
+
+// app.use(cors());
+// app.options(/.*/, cors());
 
 // Static Files
 const __dirname = path.resolve();
