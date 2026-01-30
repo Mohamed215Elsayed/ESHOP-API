@@ -75,7 +75,14 @@ export const getLoggedUserCart = asyncHandler(async(req, res, next) => {
     });
 
     if (!cart) {
-        return next(new ApiError(`No cart found for user: ${req.user._id}`, 404));
+        return res.status(200).json({
+          status: 'success',
+          numOfCartItems: 0,
+          data: {
+            cartItems: [],
+            totalCartPrice: 0,
+          },
+        });
     }
     res.status(200).json({
         status: 'success',

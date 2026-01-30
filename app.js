@@ -117,13 +117,13 @@ if (process.env.NODE_ENV === 'development') {
 // 🛡️ Rate Limiting
 // ---------------------------------------------
 // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-// const limiter = rateLimit({
-//   windowMs: 15 * 60 * 1000, // 15 min
-//   max: 100,
-//   message: 'Too many requests from this IP, please try again later.',
-// });
-// // Apply the rate limiting middleware to all requests
-// app.use('/api', limiter);
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 min
+  max: 100,
+  message: 'Too many requests from this IP, please try again later.',
+});
+// Apply the rate limiting middleware to all requests
+app.use('/api', limiter);
 
 // ---------------------------------------------
 // 📬 Test & Health Routes

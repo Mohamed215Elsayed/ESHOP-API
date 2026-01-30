@@ -173,11 +173,21 @@ export const checkoutSession = asyncHandler(async (req, res, next) => {
       },
     ],
     mode: 'payment',
-    success_url: `${req.protocol}://${req.get('host')}/orders`,
-    cancel_url: `${req.protocol}://${req.get('host')}/cart`,
+    success_url: `${process.env.FRONTEND_URL}/user/allorders`,
+    cancel_url: `${process.env.FRONTEND_URL}/cart`,
+    // success_url: `${req.protocol}://${req.get('host')}/orders`,
+    // cancel_url: `${req.protocol}://${req.get('host')}/cart`,
     customer_email: req.user.email,
     client_reference_id: req.params.cartId,
-    metadata: req.body.shippingAddress,
+    // metadata: req.body.shippingAddress,
+    // metadata: req.body ? req.body.shippingAddress : {},
+    metadata: {
+      details: req.body.shippingAddress.details,
+      phone: req.body.shippingAddress.phone,
+      city: req.body.shippingAddress.city || '',
+      alias: req.body.shippingAddress.alias || '',
+      postalCode: req.body.shippingAddress.postalCode || '',
+    },
   });
 
   // 4️⃣ Send session to client
@@ -204,7 +214,14 @@ const createCardOrder = async (session) => {
   const order = await OrderModel.create({
     user: user._id,
     cartItems: cart.cartItems,
-    shippingAddress,
+    // shippingAddress,
+    shippingAddress: {
+      details: shippingAddress.details,
+      phone: shippingAddress.phone,
+      city: shippingAddress.city,
+      alias: shippingAddress.alias,
+      postalCode: shippingAddress.postalCode,
+    },
     totalOrderPrice: orderPrice,
     isPaid: true,
     paidAt: Date.now(),
@@ -248,4 +265,21 @@ export const webhookCheckout = asyncHandler(async (req, res, next) => {
   }
 
   res.status(200).json({ received: true });
+});
+// @desc    Delete a specific order
+// @route   DELETE /api/v1/orders/:id
+// @access  Protected/Admin-Manager
+export const deleteOrder = asyncHandler(async (req, res, next) => {
+  const order = await OrderModel.findById(req.params.id);
+  if (!order) {
+    return next(new ApiError(`No order found with ID: ${req.params.id}`, 404));
+  }
+
+  await OrderModel.findByIdAndDelete(req.params.id);
+
+  res.status(204).json({
+    status: 'success',
+    message: 'Order deleted successfully',
+    data: null,
+  });
 });

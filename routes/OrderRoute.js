@@ -7,13 +7,14 @@ import {
   updateOrderToPaid,
   updateOrderToDelivered,
   checkoutSession,
+  deleteOrder,
 } from '../controllers/OrderController.js';
 import { protect, allowedTo } from '../controllers/AuthController.js';
 const router = express.Router();
 // 🔒 Protect all routes
 router.use(protect);
 // 💳 Stripe checkout session
-router.get('/checkout-session/:cartId', allowedTo('user'), checkoutSession);
+router.post('/checkout-session/:cartId', allowedTo('user'), checkoutSession);
 
 // 💵 Create cash order
 router.post('/:cartId', allowedTo('user'), createCashOrder);
@@ -25,4 +26,6 @@ router.get('/:id', allowedTo('user', 'admin', 'manager'), findSpecificOrder);
 router.put('/:id/pay', allowedTo('admin', 'manager'), updateOrderToPaid);
 // 🚚 Mark order as delivered (admin/manager only)
 router.put('/:id/deliver', allowedTo('admin', 'manager'), updateOrderToDelivered);
+// 🗑️ Delete order (admin/manager only)
+router.delete('/:id', allowedTo('admin', 'manager'), deleteOrder);
 export default router;
