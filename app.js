@@ -44,9 +44,6 @@ process.on('uncaughtException', (err) => {
 // 🚀 Express App Setup
 // ---------------------------------------------
 const app = express();
-
-// Stripe Webhook
-app.post('/webhook-checkout', express.raw({ type: 'application/json' }), webhookCheckout);
 // ---------------------------------------------
 //1. Trust Vercel proxy(important for rate limiting and logging)
 app.set('trust proxy', 1);
@@ -91,7 +88,19 @@ app.use(
 );
 
 // Parse JSON requests
-app.use(express.json({ limit: '20kb' }));
+// app.use(express.json({ limit: '20kb' }));
+app.post(
+  '/webhook-checkout',
+  express.raw({ type: 'application/json' }),
+  webhookCheckout
+);
+
+app.use((req, res, next) => {
+  if (req.originalUrl === '/webhook-checkout') {
+    return next();
+  }
+  express.json({ limit: '20kb' })(req, res, next);
+});
 
 // ---------------------------------------------
 
@@ -103,14 +112,11 @@ app.use(compression());
 // app.options(/.*/, cors());
 app.use(
   cors({
-    origin: [
-      'http://localhost:3000', // for local testing frontend
-      'https://noon-hub.vercel.app', // production frontend
-    ],
+    origin: ['https://noon-hub.vercel.app'],
     credentials: true,
   })
 );
-app.options(/.*/, cors());
+app.options('*', cors());
 // ---------------------------------------------
 // Static Files
 const __dirname = path.resolve();

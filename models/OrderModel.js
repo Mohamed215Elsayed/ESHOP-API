@@ -87,6 +87,16 @@ const orderSchema = new Schema(
       default: false,
     },
     deliveredAt: Date,
+     cartId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Cart',
+    },
+
+    paymentIntentId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
  
   },
 
@@ -110,13 +120,4 @@ const OrderModel = mongoose.model('Order', orderSchema);
 
 export default OrderModel;
 
-   // cartId: {
-    //   type: Schema.Types.ObjectId,
-    //   ref: 'Cart',
-    // },
-
-    // paymentIntentId: {
-    //   type: String,
-    //   unique: true,
-    //   sparse: true,
-    // },
+  
