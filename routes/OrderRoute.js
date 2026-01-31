@@ -14,7 +14,7 @@ const router = express.Router();
 // 🔒 Protect all routes
 router.use(protect);
 // 💳 Stripe checkout session
-router.post('/checkout-session/:cartId', allowedTo('user'), checkoutSession);
+router.get('/checkout-session/:cartId', allowedTo('user'), checkoutSession);
 
 // 💵 Create cash order
 router.post('/:cartId', allowedTo('user'), createCashOrder);

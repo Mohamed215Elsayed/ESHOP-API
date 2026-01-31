@@ -1,3 +1,4 @@
+import { webhookCheckout } from './controllers/OrderController.js';
 // ---------------------------------------------
 // 🌍 Environment Setup (must come first)
 // ---------------------------------------------
@@ -5,7 +6,7 @@ import dotenv from 'dotenv';
 // process.env.DOTENV_LOG = 'false'; // Hide dotenv startup logs
 // dotenv.config({ path: './config.env', silent: true, quiet: true });
 // dotenv.config({ path: './config.env' });
-dotenv.config();//
+dotenv.config(); //
 // ===============================================================
 // ⚙️ Core Imports & Initialization
 // ===============================================================
@@ -27,7 +28,6 @@ import connectDB from './config/database.js';
 import mountRoutes from './routes/index.js';
 import ApiError from './utils/apiError.js';
 import globalErrorHandler from './middlewares/globalErrorHandler.js';
-import { webhookCheckout } from './controllers/OrderController.js';
 
 // ---------------------------------------------
 // 🧠💥 Global Uncaught Exception Handler (Sync Errors)
@@ -44,6 +44,9 @@ process.on('uncaughtException', (err) => {
 // 🚀 Express App Setup
 // ---------------------------------------------
 const app = express();
+
+// Stripe Webhook
+app.post('/webhook-checkout', express.raw({ type: 'application/json' }), webhookCheckout);
 // ---------------------------------------------
 //1. Trust Vercel proxy(important for rate limiting and logging)
 app.set('trust proxy', 1);
@@ -52,18 +55,6 @@ app.set('trust proxy', 1);
 // app.use(passport.initialize());
 // initPassport();
 
-// Stripe Webhook
-app.post('/webhook-checkout', express.raw({ type: 'application/json' }), webhookCheckout);
-app.use(
-  express.json({
-    limit: '20kb',
-    verify: (req, res, buf) => {
-      if (req.originalUrl === '/webhook-checkout') {
-        req.rawBody = buf;
-      }
-    },
-  })
-);
 // ---------------------------------------------
 // 🛡️ Security Middlewares
 // ---------------------------------------------
@@ -100,61 +91,21 @@ app.use(
 );
 
 // Parse JSON requests
-// app.use(express.json({ limit: '20kb' }));
-// app.use((req, res, next) => {
-//   if (req.originalUrl === '/webhook-checkout') {
-//     next();
-//   } else {
-//     express.json({ limit: '20kb' })(req, res, next);
-//   }
-// });
-// app.use(
-//   express.json({
-//     limit: '20kb',
-//     verify: (req, res, buf) => {
-//       if (req.originalUrl === '/webhook-checkout') {
-//         req.rawBody = buf;
-//       }
-//     },
-//   })
-// );
+app.use(express.json({ limit: '20kb' }));
+
 // ---------------------------------------------
 
 // Response Compression
 app.use(compression());
 
 // CORS
-// const allowedOrigins = [
-//   // 'http://localhost:3000',
-//   'https://noon-hub.vercel.app',
-//   'https://eshop-api-project.vercel.app',
-// ];
-// app.use(cors({
-//   origin: function(origin, callback) {
-//     if(!origin) return callback(null, true); // Postman, curl
-//     if(allowedOrigins.indexOf(origin) === -1 && !origin.includes('stripe.com')) 
-//       return callback(new Error('CORS Not Allowed'), false);
-//     return callback(null, true);
-//   },
-//   credentials: true
-// }));
-
-// app.use(cors({
-//   origin: function(origin, callback) {
-//     if(!origin) return callback(null, true); // Postman, curl
-//     if(allowedOrigins.indexOf(origin) === -1) return callback(new Error('CORS Not Allowed'), false);
-//     return callback(null, true);
-//   },
-//   credentials: true
-// }));
-
 // app.use(cors());
 // app.options(/.*/, cors());
 app.use(
   cors({
     origin: [
-      'http://localhost:3000',// for local testing frontend
-      'https://noon-hub.vercel.app',// production frontend
+      'http://localhost:3000', // for local testing frontend
+      'https://noon-hub.vercel.app', // production frontend
     ],
     credentials: true,
   })
