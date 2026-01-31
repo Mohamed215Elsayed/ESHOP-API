@@ -424,19 +424,16 @@ const createCardOrder = async (session) => {
     const paymentIntentId = session.payment_intent;
     const cartId = session.client_reference_id;
     console.log('🔔 Webhook processing cart:', cartId);
-
     const cart = await CartModel.findById(cartId);
     if (!cart) {
       console.log('⚠️ Cart not found (already deleted?)');
       return;
     }
-
     const user = await UserModel.findOne({ email: session.customer_email });
     if (!user) {
       console.log('❌ User not found for email:', session.customer_email);
       return;
     }
-
     // const existingOrder = await OrderModel.findOne({ cartId });
     // if (existingOrder) {
     //   console.log('⚠️ Order already created for this cart');
@@ -450,7 +447,6 @@ const createCardOrder = async (session) => {
 
     const orderPrice = session.amount_total / 100;
     const shippingAddress = session.metadata;
-
     const order = await OrderModel.create({
       user: user._id,
       cartId,
@@ -504,7 +500,6 @@ export const webhookCheckout = asyncHandler(async (req, res) => {
       process.env.STRIPE_WEBHOOK_SECRET
     );
     console.log('✅ Webhook event received:', event.type);
-    // console.log('✅ Webhook received:', event.type);
   } catch (err) {
     console.error('❌ Webhook signature failed:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
@@ -561,7 +556,6 @@ export const deleteOrder = asyncHandler(async (req, res, next) => {
   if (!order) {
     return next(new ApiError(`No order found with ID: ${req.params.id}`, 404));
   }
-
   await OrderModel.findByIdAndDelete(req.params.id);
   res.status(204).json({ status: 'success' });
 });

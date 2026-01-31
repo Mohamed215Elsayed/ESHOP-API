@@ -125,7 +125,8 @@ app.use(compression());
 
 // CORS
 const allowedOrigins = [
-  'http://localhost:3000',
+  // 'http://localhost:3000',
+  'https://noon-hub.vercel.app',
   'https://eshop-api-project.vercel.app',
 ];
 app.use(cors({
