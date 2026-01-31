@@ -4,8 +4,8 @@
 import dotenv from 'dotenv';
 // process.env.DOTENV_LOG = 'false'; // Hide dotenv startup logs
 // dotenv.config({ path: './config.env', silent: true, quiet: true });
-dotenv.config({ path: './config.env' });
-
+// dotenv.config({ path: './config.env' });
+dotenv.config();//
 // ===============================================================
 // ⚙️ Core Imports & Initialization
 // ===============================================================
@@ -148,9 +148,19 @@ app.use(compression());
 //   credentials: true
 // }));
 
-app.use(cors());
+// app.use(cors());
+// app.options(/.*/, cors());
+app.use(
+  cors({
+    origin: [
+      'http://localhost:3000',// for local testing frontend
+      'https://noon-hub.vercel.app',// production frontend
+    ],
+    credentials: true,
+  })
+);
 app.options(/.*/, cors());
-
+// ---------------------------------------------
 // Static Files
 const __dirname = path.resolve();
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -170,7 +180,7 @@ if (process.env.NODE_ENV === 'development') {
 // Limit each IP to 100 requests per `window` (here, per 15 minutes)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 min
-  max: 100,
+  max: 1000,
   message: 'Too many requests from this IP, please try again later.',
 });
 // Apply the rate limiting middleware to all requests
