@@ -1,201 +1,187 @@
-🚀 Excited to Announce My New Project: E-Shop RESTful API
 
-I’m thrilled to share my latest backend project — a fully functional, production-ready E-Commerce RESTful API built using Node.js, Express.js, and MongoDB 🛍️⚡
+# E-Shop RESTful API
 
-This project represents months of learning, building, and debugging — to create a real-world backend system that can power any online store (web or mobile).
+A **production-ready E-Commerce Backend API** built with **Node.js, Express, MongoDB, Mongoose** and **Stripe**, supporting full e-commerce functionalities including authentication, payments, orders, products, and more.
 
-🌐 Live Demo & Docs
-🔗 Live API: https://eshop-api-project.vercel.app
-📘 Postman API Docs (Dev): https://documenter.getpostman.com/view/35008610/2sB3WnvgqX
-🌍 Postman API Docs (Prod): https://documenter.getpostman.com/view/35008610/2sB3WnvgqZ
-💾 GitHub Repo: https://github.com/Mohamed215Elsayed/ESHOP-API
+🌐 **Live API:** [https://eshop-back-mu.vercel.app/](https://eshop-back-mu.vercel.app/)  
+💾 **GitHub Repository:** [https://github.com/Mohamed215Elsayed/ESHOP-API](https://github.com/Mohamed215Elsayed/ESHOP-API)  
 
-🧩 Project Overview
+---
 
-The E-Shop API is a modular, scalable backend system designed to handle all e-commerce functionalities, from managing products and categories to handling authentication, payments, and security.
+## **Features**
 
-It’s built following RESTful principles, MVC architecture, and clean, reusable code practices.
+- CRUD operations for Products, Categories, Subcategories, Brands  
+- Shopping Cart & Wishlist management  
+- User Authentication & Role-based Authorization (JWT)  
+- Stripe Payments integration (Cash & Online)  
+- Email verification & password reset  
+- Product reviews & rating system  
+- Discount coupon system  
+- Order management  
+- Global validation & error handling  
+- MongoDB Atlas integration  
+- Deployed on **Vercel**  
 
-⚙️ Core Features
+---
 
-🛒 E-Commerce Functionalities
-Categories, Subcategories, Brands & Products CRUD operations
-Advanced search, sorting, filtering & pagination
-Image upload (single & multiple) + image processing with Sharp
-Product reviews & rating system
-Wishlist & user addresses management
-Discount coupon system
-Shopping cart (add/remove/update items)
-Order management (cash & online payment via Stripe)
-🔐 Authentication & Authorization
-Secure JWT authentication (Login, Signup, Password reset) such as in linkedIn
-Role-based access control (Admin, Manager, User)
+## **Tech Stack**
 
-Email activation flow with verification code
-Password encryption & password reset via email
+- **Backend:** Node.js, Express.js  
+- **Database:** MongoDB Atlas, Mongoose  
+- **Authentication:** JWT, Password Encryption, Email Verification  
+- **Payments:** Stripe  
+- **Validation:** class-validator, Zod  
+- **Deployment:** Vercel  
 
-⚡ Advanced API Capabilities
-Global error handling & validation layer
-Mongoose population & relationships between collections
-Middleware for request logging, sanitization, rate limiting & compression
-Cloud database connection with MongoDB Atlas
-Deployed & hosted on Vercel
+---
 
-🧡 Technologies Used
-Node.js | Express.js | MongoDB | Mongoose | JWT | Stripe | Sharp | Multer | Postman | Vercel
+## **Getting Started**
 
-#Nodejs #Express #MongoDB #RESTfulAPI #BackendDeveloper #Ecommerce #JavaScript #WebDevelopment #Mongoose #Stripe #JWT #Vercel #Postman #CleanCode #BackendDevelopment #PortfolioProject
+### **Prerequisites**
 
-🚀 متحمس جدًا للإعلان عن مشروعي الجديد: E-Shop RESTful API
+- Node.js >= 18  
+- npm / yarn  
+- MongoDB Atlas URI or local MongoDB  
 
-يسعدني أشارك معاكم آخر مشاريعي في مجال الـ Backend — مشروع متجر إلكتروني متكامل مبني باستخدام Node.js, Express.js, و MongoDB 🛍️⚡
+### **Setup**
 
-المشروع ده نتاج شهور من التعلم، والتطبيق، والتجريب … عشان أقدر أوصل لنظام Backend حقيقي جاهز للتطبيق في أي متجر إلكتروني سواء Web أو Mobile.
+1. Clone the repository:
+```bash
+git clone https://github.com/Mohamed215Elsayed/ESHOP-API.git
+cd ESHOP-API
 
-🌐 رابط المشروع والتوثيق
 
-🔗 رابط الـ API (Live): https://eshop-api-project.vercel.app
+Install dependencies:
 
-📘 توثيق Postman (النسخة التجريبية): https://documenter.getpostman.com/view/35008610/2sB3WnvgqX
+npm install
 
-🌍 توثيق Postman (النسخة الإنتاجية): https://documenter.getpostman.com/view/35008610/2sB3WnvgqZ
 
-💾 المصدر على GitHub: https://github.com/Mohamed215Elsayed/ESHOP-API
+Create .env.development file (example):
 
-🧩 نظرة عامة على المشروع
+NODE_ENV=development
+PORT=5000
+DB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/eshop?retryWrites=true&w=majority
+JWT_SECRET=your_jwt_secret
+STRIPE_SECRET_KEY=your_stripe_secret
+EMAIL_HOST=smtp.example.com
+EMAIL_USER=example@example.com
+EMAIL_PASS=your_email_password
 
-مشروع E-Shop API هو نظام Backend مرن وقابل للتوسع، بيغطي كل العمليات الأساسية في المتاجر الإلكترونية — من إدارة المنتجات والتصنيفات إلى تسجيل الدخول، الطلبات، والمدفوعات.
 
-اتبعت في تنفيذه مبادئ RESTful API، وهيكلة MVC Architecture، وكتابة كود نظيف وسهل التطوير.
+Start the development server:
 
-⚙️ أهم المميزات
+npm run start:dev
 
-🛒 مميزات المتجر الإلكتروني
 
-إنشاء وتعديل وحذف الأقسام، الأقسام الفرعية، العلامات التجارية، والمنتجات
+Server will run on http://localhost:5000
 
-بحث متقدم + فرز + فلترة + تقسيم النتائج (Pagination)
+Folder Structure
+src/
+├─ modules/
+│  ├─ products/
+│  ├─ users/
+│  ├─ reviews/
+├─ config/
+├─ main.ts
+├─ app.module.ts
 
-رفع صورة أو أكثر للمنتج مع معالجة الصور باستخدام مكتبة Sharp
+API Documentation
 
-نظام تقييمات ومراجعات للمنتجات
+Postman Development Docs: https://documenter.getpostman.com/view/35008610/2sB3WnvgqX
 
-إدارة قائمة المفضلة والعناوين الخاصة بالمستخدم
+Postman Production Docs: https://documenter.getpostman.com/view/35008610/2sB3WnvgqZ
 
-نظام كوبونات خصم
+License
 
-عربة تسوق لإضافة المنتجات والتعديل عليها
+MIT License
 
-إدارة الطلبات (الدفع عند الاستلام أو الدفع أونلاين عبر Stripe)
 
-🔐 المصادقة والصلاحيات (Authentication & Authorization)
+---
 
-نظام تسجيل دخول وتسجيل مستخدمين باستخدام JWT
+## **Frontend README – NoonHub**
 
-صلاحيات متعددة (مدير – مدير فرعي – مستخدم عادي)
+```markdown
+# NoonHub – React E-Commerce Frontend
 
-تفعيل الحساب عبر كود تأكيد يُرسل إلى الإيميل
+A **React Frontend for E-Commerce** fully integrated with **E-Shop API**, built with **React, React Bootstrap, Redux Toolkit, React Hook Form & Zod**, supporting shopping, wishlist, product reviews, and payments.
 
-تشفير كلمات المرور واسترجاعها عبر البريد الإلكتروني
+🌐 **Live Frontend:** [https://noon-hub.vercel.app/](https://noon-hub.vercel.app/)  
+💾 **GitHub Repository:** [https://github.com/Mohamed215Elsayed/NoonHub](https://github.com/Mohamed215Elsayed/NoonHub)  
 
-⚡ مزايا إضافية في الـ API
+---
 
-معالجة الأخطاء بشكل احترافي (Global Error Handling)
+## **Features**
 
-التحقق من البيانات (Validation Layer)
+- Product listing with search, filtering, and pagination  
+- Shopping cart & wishlist management  
+- User authentication & role-based access  
+- Stripe payments integration  
+- Product reviews & ratings  
+- React Bootstrap responsive UI  
+- Redux Toolkit for state management  
+- React Hook Form + Zod for validation  
+- Image upload & preview  
+- Fully integrated with backend API  
 
-ربط بين الجداول (Collections Relations) باستخدام Mongoose
+---
 
-Middleware للأمان، تسجيل الطلبات، ضغط البيانات، وحدود للطلبات
+## **Tech Stack**
 
-اتصال آمن بقاعدة بيانات MongoDB Atlas
+- **Frontend:** React, React Bootstrap, Vite  
+- **State Management:** Redux Toolkit  
+- **Form Handling:** React Hook Form + Zod  
+- **Styling:** React Bootstrap  
+- **HTTP Requests:** Axios  
+- **Deployment:** Vercel  
 
-نشر المشروع بالكامل على Vercel
+---
 
-🧡 التقنيات المستخدمة
+## **Getting Started**
 
-Node.js | Express.js | MongoDB | Mongoose | JWT | Stripe | Sharp | Multer | Postman | Vercel
+### **Prerequisites**
 
-💬 تعلمت من المشروع
+- Node.js >= 18  
+- npm / yarn  
+- Running backend API (E-Shop API)  
 
-من خلال المشروع ده اكتسبت خبرة قوية في:
+### **Setup**
 
-تصميم RESTful APIs بطريقة احترافية
+1. Clone the repository:
+```bash
+git clone https://github.com/Mohamed215Elsayed/NoonHub.git
+cd NoonHub
 
-بناء نظام Authentication آمن ومرن
 
-التعامل مع MongoDB والعلاقات المعقدة بين الـ Collections
+Install dependencies:
 
-رفع الصور ومعالجتها وتحسين الأداء
+npm install
 
-إعداد التوثيق الكامل للـ API باستخدام Postman
 
-نشر التطبيقات السحابية على Vercel
+Create .env.development file:
 
-#Nodejs #Express #MongoDB #Backend #API #Ecommerce #JavaScript #WebDevelopment #Stripe #JWT #Vercel #Postman #CleanCode #BackendDevelopment #PortfolioProject #برمجة #مشاريع*تخرج #تطوير*ويب
+REACT_APP_API_URL=https://eshop-back-mu.vercel.app/
 
-🚀 أخيرًا! أطلقت مشروعي الجديد – E-Shop RESTful API
 
-يسعدني أشارككم أحدث مشاريعي في مجال تطوير الـBackend 👨‍💻
-مشروع متجر إلكتروني متكامل تم بناؤه باستخدام Node.js, Express.js, وMongoDB، يمثل خلاصة رحلة تعلم وتجربة عملية لبناء نظام حقيقي قابل للتوسع ويخدم تطبيقات الويب والموبايل.
+Start the development server:
 
-🧩 مميزات المشروع:
-✅ إدارة المنتجات، التصنيفات، والماركات التجارية
-✅ نظام مراجعات وتقييمات متكامل
-✅ رفع ومعالجة الصور باستخدام Sharp
-✅ سلة مشتريات وكوبونات خصم
-✅ نظام الطلبات والدفع أونلاين عبر Stripe
-✅ مصادقة JWT وصلاحيات متعددة (Admin / Manager / User)
-✅ تفعيل البريد الإلكتروني واستعادة كلمة المرور
-✅ فلترة وبحث متقدم، وتسجيل الأنشطة والطلبات
+npm run start
 
-🌐 جرب المشروع بنفسك:
-🔗 Live API: https://eshop-api-project.vercel.app
 
-📘 Postman Docs: https://documenter.getpostman.com/view/35008610/2sB3WnvgqZ
+Frontend will run on http://localhost:5173
 
-💾 GitHub Repo: https://github.com/Mohamed215Elsayed/ESHOP-API
+Folder Structure
+src/
+├─ components/
+├─ pages/
+├─ store/
+├─ hooks/
+├─ services/
+├─ App.tsx
+├─ main.tsx
 
-💬 فخور باللي وصلت له في المشروع ده، ومتحمس أسمع آراءكم واقتراحاتكم 🙌
+License
 
-#Nodejs #Express #MongoDB #Backend #RESTfulAPI #Ecommerce #JavaScript #Stripe #JWT #Postman #Vercel #WebDevelopment #PortfolioProject #برمجة #مشاريع_برمجة #BackEndDeveloper
+MIT License
 
-🚀 Excited to Announce My New Project – E-Shop RESTful API!
-I’m thrilled to share my latest backend project, a complete and production-ready E-Commerce RESTful API built using Node.js, Express.js, and MongoDB 🛍️⚡
 
-This project represents months of learning, planning, and debugging to create a real-world, scalable backend system ready to power any online store — whether web or mobile.
 
-🧩 Key Features:
-✅ Categories, Subcategories, Brands & Products CRUD Operations
-✅ Advanced Search, Filtering, Sorting & Pagination
-✅ Image Upload (Single & Multiple) + Image Processing with Sharp
-✅ Reviews & Ratings System
-✅ Wishlist & User Address Management
-✅ Shopping Cart + Discount Coupons
-✅ Cash & Online Payments (Stripe Integration)
-✅ Authentication & Authorization (JWT, Role-based Access Control)
-✅ Email Verification & Password Reset
-✅ Global Error Handling & Validation Layer
-✅ Cloud Database (MongoDB Atlas) + Production Deployment (Vercel)
-
-⚙️ Architecture Highlights:
-🏗️ Built on clean MVC structure with an added Factory Service Layer above controllers — enabling scalable and reusable business logic.
-♻️ Implemented Reusable Components and Middlewares for validation, sanitization, logging, and error handling.
-🚦 Follows RESTful best practices with layered design and maintainable, production-grade code.
-
-💡 Lessons Learned & Challenges:
-One of the biggest challenges was designing reusable logic across multiple modules while keeping controllers clean and maintainable.
-Building the Factory Service Layer helped me separate business logic efficiently and make the project more scalable.
-Also, optimizing MongoDB queries and handling complex population relationships improved both performance and structure.
-
-🌐 Try It Yourself:
-🔗 Live API: https://eshop-api-project.vercel.app
-
-📘 Postman Docs (Prod): https://documenter.getpostman.com/view/35008610/2sB3WnvgqZ
-
-💾 GitHub Repo: https://github.com/Mohamed215Elsayed/ESHOP-API
-
-💬 I’m really proud of what I’ve built and how much I’ve learned through this journey.
-Would love to hear your feedback and thoughts 🙌
-
-#Nodejs #Express #MongoDB #RESTfulAPI #BackendDeveloper #Ecommerce #JavaScript #Mongoose #Stripe #JWT #Vercel #Postman #CleanArchitecture #ServiceLayer #ReusableComponents #BackendDevelopment #PortfolioProject #WebDevelopment
